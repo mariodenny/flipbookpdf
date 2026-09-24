@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Read this book as an interactive flipbook.">
+  <title>PDF Flipbook</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="viewer-page" id="viewer-page">
+
+    <!-- Header with book title -->
+    <div class="viewer-header">
+      <h1 id="book-title">Loading…</h1>
+    </div>
+
+    <!-- Flipbook area -->
+    <div class="viewer-container">
+      <div id="flipbook-wrapper">
+        <!-- Loading state -->
+        <div id="viewer-loading" class="viewer-loading">
+          <div class="spinner-lg"></div>
+          <p id="loading-text">Loading PDF…</p>
+        </div>
+
+        <!-- Error state (hidden by default) -->
+        <div id="viewer-error" class="viewer-error" style="display:none;">
+          <div class="icon">⚠️</div>
+          <h2>Unable to load the PDF</h2>
+          <p>Please try refreshing the page.</p>
+        </div>
+
+        <!-- StPageFlip container (populated by JS) -->
+        <div id="flipbook"></div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="viewer-controls" id="viewer-controls" style="display:none;">
+      <button class="btn-ctrl" id="btn-prev" title="Previous Page">← Prev</button>
+      <span class="page-info" id="page-info">1 / 1</span>
+      <button class="btn-ctrl" id="btn-next" title="Next Page">Next →</button>
+      <button class="btn-ctrl" id="btn-fullscreen" title="Fullscreen">⛶ Fullscreen</button>
+      <a class="btn-ctrl" id="btn-download" title="Download PDF" download>⬇ Download</a>
+    </div>
+  </div>
+
+  <!-- StPageFlip from CDN -->
+  <script src="https://unpkg.com/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+
+  <script src="/js/viewer.js" type="module"></script>
+</body>
+</html>

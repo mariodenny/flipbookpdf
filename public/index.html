@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Upload a PDF and turn it into a beautiful animated flipbook.">
+  <title>PDF Flipbook — Upload</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="brand">
+      <h1>📖 PDF Flipbook</h1>
+      <p>Turn your PDF into a book</p>
+    </header>
+
+    <main class="card">
+      <div id="alert" class="alert" role="alert"></div>
+
+      <form id="upload-form" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="title">Book Title</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            class="form-control"
+            placeholder="e.g. Pengantar Kebugaran Jasmani"
+            maxlength="200"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="file">PDF File</label>
+          <div class="file-input-wrapper">
+            <input
+              type="file"
+              id="file"
+              name="file"
+              accept=".pdf,application/pdf"
+              required
+            >
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn-primary">
+          Generate Flipbook
+        </button>
+      </form>
+    </main>
+
+    <p style="text-align:center; margin-top:1.5rem;">
+      <a href="/books">View All Books →</a>
+    </p>
+  </div>
+
+  <script src="/js/upload.js"></script>
+</body>
+</html>

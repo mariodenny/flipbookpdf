@@ -1,0 +1,465 @@
+/* ============================================
+   PDF FLIPBOOK — GLOBAL STYLES
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---------- Reset & Base ---------- */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #0f0f13;
+  color: #e4e4e7;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+a {
+  color: #a78bfa;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover {
+  color: #c4b5fd;
+}
+
+/* ---------- Utility ---------- */
+
+.container {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ---------- Header / Brand ---------- */
+
+.brand {
+  text-align: center;
+  padding: 3rem 0 1rem;
+}
+.brand h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6366f1, #a78bfa, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+.brand p {
+  margin-top: 0.4rem;
+  color: #71717a;
+  font-size: 0.95rem;
+}
+
+/* ---------- Card ---------- */
+
+.card {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 1.5rem;
+}
+
+/* ---------- Form Elements ---------- */
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #a1a1aa;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #09090b;
+  border: 1px solid #3f3f46;
+  border-radius: 10px;
+  color: #e4e4e7;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+.form-control::placeholder {
+  color: #52525b;
+}
+
+/* File input wrapper */
+.file-input-wrapper {
+  position: relative;
+}
+.file-input-wrapper input[type="file"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #09090b;
+  border: 2px dashed #3f3f46;
+  border-radius: 10px;
+  color: #a1a1aa;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.file-input-wrapper input[type="file"]:hover {
+  border-color: #6366f1;
+}
+.file-input-wrapper input[type="file"]::file-selector-button {
+  padding: 0.4rem 1rem;
+  margin-right: 0.75rem;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.file-input-wrapper input[type="file"]::file-selector-button:hover {
+  opacity: 0.85;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.btn:hover {
+  opacity: 0.9;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+}
+.btn-secondary {
+  background: #27272a;
+  color: #e4e4e7;
+}
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+}
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+}
+
+/* ---------- Alerts ---------- */
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  display: none;
+}
+.alert.show {
+  display: block;
+}
+.alert-error {
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  color: #fca5a5;
+}
+.alert-success {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: #86efac;
+}
+
+/* ---------- Spinner ---------- */
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   BOOKS LIST PAGE
+   ============================================ */
+
+.books-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.books-header h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.book-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.book-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  transition: border-color 0.2s;
+}
+.book-item:hover {
+  border-color: #3f3f46;
+}
+.book-info {
+  flex: 1;
+  min-width: 0;
+}
+.book-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.book-info .slug {
+  font-size: 0.8rem;
+  color: #71717a;
+  margin-top: 0.2rem;
+  font-family: 'Courier New', monospace;
+}
+.book-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #71717a;
+}
+.empty-state .icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ============================================
+   FLIPBOOK VIEWER PAGE
+   ============================================ */
+
+.viewer-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #0a0a0d;
+}
+
+.viewer-header {
+  text-align: center;
+  padding: 1rem 1rem 0.5rem;
+}
+.viewer-header h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #e4e4e7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80vw;
+  margin: 0 auto;
+}
+
+.viewer-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  position: relative;
+}
+
+#flipbook-wrapper {
+  position: relative;
+}
+
+/* Loading overlay inside viewer */
+.viewer-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: #a1a1aa;
+  padding: 4rem 2rem;
+}
+.viewer-loading .spinner-lg {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.viewer-loading p {
+  font-size: 0.95rem;
+}
+
+/* Viewer error */
+.viewer-error {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #fca5a5;
+}
+.viewer-error .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.viewer-error p { color: #a1a1aa; margin-top: 0.5rem; }
+
+/* Controls bar */
+.viewer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #18181b;
+  border-top: 1px solid #27272a;
+  flex-wrap: wrap;
+}
+
+.viewer-controls .btn-ctrl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.9rem;
+  background: #27272a;
+  color: #e4e4e7;
+  border: 1px solid #3f3f46;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.viewer-controls .btn-ctrl:hover {
+  background: #3f3f46;
+  border-color: #52525b;
+}
+.viewer-controls .btn-ctrl:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.viewer-controls .page-info {
+  font-size: 0.85rem;
+  color: #a1a1aa;
+  padding: 0 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Fullscreen adjustments */
+.viewer-page.fullscreen {
+  background: #000;
+}
+.viewer-page.fullscreen .viewer-header {
+  padding-top: 0.75rem;
+}
+
+/* The StPageFlip container */
+.stf__parent {
+  /* Remove any extra borders StPageFlip might add */
+}
+
+/* Page appearance */
+.page-canvas {
+  background: #fff;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 640px) {
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+  .card {
+    padding: 1.25rem;
+  }
+  .book-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .book-actions {
+    width: 100%;
+  }
+  .book-actions .btn-sm {
+    flex: 1;
+  }
+  .viewer-header h1 {
+    font-size: 1rem;
+  }
+  .viewer-controls {
+    gap: 0.35rem;
+  }
+  .viewer-controls .btn-ctrl {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.8rem;
+  }
+}
