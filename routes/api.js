@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const slugify = require('slugify');
 const { uploadPDF, deletePDF } = require('../services/cloudinary');
 const { insertBook, getAllBooks, getBookById, deleteBookById } = require('../db/turso');
+const { convertToPdf, SUPPORTED_MIMES, SUPPORTED_EXTS, getExtension } = require('../services/documentConverter');
 
 const router = express.Router();
 
@@ -14,19 +15,20 @@ const upload = multer({
   limits: { fileSize: maxSize },
   fileFilter: (_req, file, cb) => {
     // Validate MIME type and extension
-    const allowedMimes = ['application/pdf'];
-    const allowedExts = ['.pdf'];
-    const ext = '.' + file.originalname.split('.').pop().toLowerCase();
+    const ext = getExtension(file.originalname);
 
-    if (!allowedMimes.includes(file.mimetype) || !allowedExts.includes(ext)) {
-      return cb(new Error('Only PDF files are allowed.'));
+    const mimeOk = SUPPORTED_MIMES.includes(file.mimetype);
+    const extOk = SUPPORTED_EXTS.includes(ext);
+
+    if (!mimeOk && !extOk) {
+      return cb(new Error('Unsupported document type. Supported: PDF, DOC, DOCX, TXT, MD, RTF.'));
     }
     cb(null, true);
   },
 });
 
 /**
- * POST /api/books — Upload a new PDF book
+ * POST /api/books — Upload a new document (PDF or convertible document)
  */
 router.post('/books', (req, res, next) => {
   upload.single('file')(req, res, async (err) => {
@@ -36,7 +38,7 @@ router.post('/books', (req, res, next) => {
         if (err.code === 'LIMIT_FILE_SIZE') {
           return res.status(400).json({
             success: false,
-            error: `The PDF is too large. Maximum size is ${process.env.MAX_FILE_SIZE_MB || 50}MB.`,
+            error: `The file is too large. Maximum size is ${process.env.MAX_FILE_SIZE_MB || 50}MB.`,
           });
         }
         return res.status(400).json({ success: false, error: err.message });
@@ -53,13 +55,18 @@ router.post('/books', (req, res, next) => {
 
       // Validate file
       if (!req.file) {
-        return res.status(400).json({ success: false, error: 'Please upload a PDF file.' });
+        return res.status(400).json({ success: false, error: 'Please upload a document file.' });
       }
 
-      // Extra PDF header validation (first 5 bytes should be %PDF-)
-      const header = req.file.buffer.slice(0, 5).toString('ascii');
-      if (header !== '%PDF-') {
-        return res.status(400).json({ success: false, error: 'The uploaded file is not a valid PDF.' });
+      // Convert to PDF if necessary
+      let pdfBuffer;
+      let fileType;
+      try {
+        const result = await convertToPdf(req.file.buffer, req.file.originalname, req.file.mimetype);
+        pdfBuffer = result.pdfBuffer;
+        fileType = result.fileType;
+      } catch (convErr) {
+        return res.status(400).json({ success: false, error: convErr.message });
       }
 
       // Generate slug
@@ -70,10 +77,10 @@ router.post('/books', (req, res, next) => {
       // Generate a unique Cloudinary public ID
       const cloudinaryPublicId = `${baseSlug}-${shortId}`;
 
-      // Upload to Cloudinary
+      // Upload the final PDF to Cloudinary
       let cloudResult;
       try {
-        cloudResult = await uploadPDF(req.file.buffer, cloudinaryPublicId);
+        cloudResult = await uploadPDF(pdfBuffer, cloudinaryPublicId);
       } catch (uploadErr) {
         console.error('Cloudinary upload error:', uploadErr);
         return res.status(500).json({ success: false, error: 'Upload failed. Please try again.' });
@@ -88,6 +95,7 @@ router.post('/books', (req, res, next) => {
           pdfUrl: cloudResult.secure_url,
           cloudinaryPublicId: cloudResult.public_id,
           originalFilename: req.file.originalname,
+          originalFileType: fileType,
         });
       } catch (dbErr) {
         console.error('Database insert error:', dbErr);

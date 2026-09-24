@@ -16,14 +16,21 @@ Upload a PDF and display it as a beautiful animated flipbook with realistic page
 
 ## How It Works
 
-1. User uploads a PDF with a title
-2. PDF is stored in **Cloudinary** (raw file)
-3. Book metadata (title, slug, PDF URL) is saved in **Turso**
-4. A unique public URL is generated (e.g., `/book/pengantar-kebugaran-a81f32`)
-5. When the URL is opened, the browser:
-   - Loads the PDF from Cloudinary using **PDF.js**
-   - Renders each page to a canvas
-   - Displays them as an interactive flipbook with **StPageFlip**
+- **PDF upload**: Uploaded directly to **Cloudinary** (fast path).
+- **Document upload** (DOC, DOCX, TXT, MD, RTF): Automatically converted to a clean PDF in memory before being stored in Cloudinary.
+- **Turso**: Stores metadata (title, slug, PDF URL, Cloudinary public ID, original filename & format).
+- **Flipbook Viewer**: Consumes the generated PDF via **PDF.js** and renders pages in **StPageFlip** with realistic 3D page turns.
+
+### Supported Document Formats (V1.1)
+
+| Format | Extension | Conversion Mechanism |
+|--------|-----------|----------------------|
+| **PDF** | `.pdf` | Direct upload (no conversion) |
+| **Word (Modern)** | `.docx` | HTML formatting via `mammoth` → `pdfkit` (preserves headings, bold, italic, lists) |
+| **Word (Legacy)** | `.doc` | Text extraction via `word-extractor` → `pdfkit` |
+| **Markdown** | `.md` | Rendered via `marked` + HTML parser → `pdfkit` |
+| **Plain Text** | `.txt` | Formatted paragraphs and margins via `pdfkit` |
+| **Rich Text** | `.rtf` | RTF token stripping with paragraph structure → `pdfkit` |
 
 ## Setup
 

@@ -5,6 +5,9 @@
   const submitBtn = document.getElementById('submit-btn');
   const alert = document.getElementById('alert');
 
+  const SUPPORTED_EXTS = ['.pdf', '.doc', '.docx', '.txt', '.md', '.rtf'];
+  let loadingInterval = null;
+
   function showAlert(message, type = 'error') {
     alert.textContent = message;
     alert.className = `alert alert-${type} show`;
@@ -14,11 +17,44 @@
     alert.className = 'alert';
   }
 
-  function setLoading(loading) {
+  function updateStatus(text) {
+    submitBtn.innerHTML = `<span class="spinner"></span> ${text}`;
+  }
+
+  function setLoading(loading, isPdf = false) {
+    if (loadingInterval) {
+      clearInterval(loadingInterval);
+      loadingInterval = null;
+    }
+
     if (loading) {
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="spinner"></span> Uploading…';
+      if (isPdf) {
+        updateStatus('Uploading PDF…');
+        // Transition to generating flipbook after a moment
+        loadingInterval = setTimeout(() => {
+          updateStatus('Generating flipbook…');
+        }, 1500);
+      } else {
+        updateStatus('Uploading document…');
+        // Progressive feedback for conversion
+        const step1 = setTimeout(() => {
+          updateStatus('Converting document to PDF…');
+        }, 1200);
+        const step2 = setTimeout(() => {
+          updateStatus('Generating flipbook…');
+        }, 3000);
+        loadingInterval = {
+          clear: () => {
+            clearTimeout(step1);
+            clearTimeout(step2);
+          },
+        };
+      }
     } else {
+      if (loadingInterval && typeof loadingInterval.clear === 'function') {
+        loadingInterval.clear();
+      }
       submitBtn.disabled = false;
       submitBtn.textContent = 'Generate Flipbook';
     }
@@ -37,30 +73,27 @@
     }
 
     if (!fileInput.files.length) {
-      showAlert('Please upload a PDF file.');
+      showAlert('Please select a document file to upload.');
       return;
     }
 
     const file = fileInput.files[0];
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
 
     // Check extension
-    if (!file.name.toLowerCase().endsWith('.pdf')) {
-      showAlert('Only PDF files are allowed.');
+    if (!SUPPORTED_EXTS.includes(ext)) {
+      showAlert('Unsupported document type. Supported: PDF, DOC, DOCX, TXT, MD, RTF.');
       return;
     }
 
-    // Check MIME type (some browsers may report differently)
-    if (file.type && file.type !== 'application/pdf') {
-      showAlert('Only PDF files are allowed.');
-      return;
-    }
+    const isPdf = ext === '.pdf';
 
     // Build FormData
     const formData = new FormData();
     formData.append('title', title);
     formData.append('file', file);
 
-    setLoading(true);
+    setLoading(true, isPdf);
 
     try {
       const res = await fetch('/api/books', {

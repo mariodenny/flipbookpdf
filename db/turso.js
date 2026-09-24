@@ -22,20 +22,38 @@ async function initDB() {
       pdf_url TEXT NOT NULL,
       cloudinary_public_id TEXT NOT NULL,
       original_filename TEXT NOT NULL,
+      original_file_type TEXT DEFAULT 'pdf',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Safely migrate existing tables if original_file_type column does not exist yet
+  try {
+    await client.execute(`ALTER TABLE books ADD COLUMN original_file_type TEXT DEFAULT 'pdf'`);
+  } catch (_) {
+    // Column already exists or table freshly created
+  }
 }
 
-async function insertBook({ title, slug, pdfUrl, cloudinaryPublicId, originalFilename }) {
+async function insertBook({ title, slug, pdfUrl, cloudinaryPublicId, originalFilename, originalFileType = 'pdf' }) {
   const client = getDB();
-  const result = await client.execute({
-    sql: `INSERT INTO books (title, slug, pdf_url, cloudinary_public_id, original_filename)
-          VALUES (?, ?, ?, ?, ?)`,
-    args: [title, slug, pdfUrl, cloudinaryPublicId, originalFilename],
-  });
-  return result.lastInsertRowid;
+  try {
+    const result = await client.execute({
+      sql: `INSERT INTO books (title, slug, pdf_url, cloudinary_public_id, original_filename, original_file_type)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+      args: [title, slug, pdfUrl, cloudinaryPublicId, originalFilename, originalFileType],
+    });
+    return result.lastInsertRowid;
+  } catch (err) {
+    // Graceful fallback if database schema is without original_file_type
+    const result = await client.execute({
+      sql: `INSERT INTO books (title, slug, pdf_url, cloudinary_public_id, original_filename)
+            VALUES (?, ?, ?, ?, ?)`,
+      args: [title, slug, pdfUrl, cloudinaryPublicId, originalFilename],
+    });
+    return result.lastInsertRowid;
+  }
 }
 
 async function getBookBySlug(slug) {

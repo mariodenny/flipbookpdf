@@ -42,10 +42,11 @@
   }
 
   function bookCard(book) {
+    const fileType = (book.original_file_type || (book.original_filename ? book.original_filename.split('.').pop() : 'pdf')).toUpperCase();
     return `
       <div class="book-item">
         <div class="book-info">
-          <h3>${escapeHtml(book.title)}</h3>
+          <h3>${escapeHtml(book.title)} <span class="format-badge" style="font-size:0.7rem; padding:0.15rem 0.45rem; border-radius:4px; background:rgba(99,102,241,0.15); color:var(--primary, #6366f1); font-weight:600; text-transform:uppercase; vertical-align:middle; margin-left:0.3rem;">${escapeHtml(fileType)}</span></h3>
           <div class="slug">${escapeHtml(book.slug)}</div>
         </div>
         <div class="book-actions">
