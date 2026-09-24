@@ -330,12 +330,26 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: calc(100vh - 125px);
+  min-height: 400px;
+  box-sizing: border-box;
 }
 
 #flipbook-wrapper {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+#flipbook {
+  margin: 0 auto;
 }
 
 /* Loading overlay inside viewer */
@@ -429,6 +443,15 @@ a:hover {
 /* Page appearance */
 .page-canvas {
   background: #fff;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+.page-canvas img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 /* ============================================

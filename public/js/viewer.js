@@ -31,6 +31,7 @@ if (!bookData) {
 
 let pageFlip = null;
 let totalPages = 0;
+let currentRatio = 0.707;
 
 // ── Init ────────────────────────────────────────────────────
 
@@ -63,15 +64,24 @@ async function init() {
     const viewport = firstPage.getViewport({ scale: 1 });
     const pageRatio = viewport.width / viewport.height;
 
+    // Store aspect ratio for resizing
+    currentRatio = pageRatio;
+
     // Calculate flipbook dimensions based on available space
     const dims = calcDimensions(pageRatio);
 
-    // Render all pages into image elements
+    // Render all pages into image elements at high resolution
     loadingText.textContent = 'Rendering pages…';
     const pages = await renderAllPages(pdf, dims.pageWidth, dims.pageHeight);
 
     // Hide loading, show flipbook
     loadingEl.style.display = 'none';
+
+    // Set explicit spread dimensions on #flipbook container so StPageFlip doesn't collapse
+    const isMobile = window.innerWidth <= 768;
+    const spreadWidth = isMobile ? dims.pageWidth : dims.pageWidth * 2;
+    flipbookEl.style.width = `${spreadWidth}px`;
+    flipbookEl.style.height = `${dims.pageHeight}px`;
 
     // Create page elements inside #flipbook
     pages.forEach((imgSrc, i) => {
@@ -93,16 +103,14 @@ async function init() {
     });
 
     // Initialize StPageFlip
-    const isMobile = window.innerWidth <= 768;
-
     pageFlip = new St.PageFlip(flipbookEl, {
       width: dims.pageWidth,
       height: dims.pageHeight,
       size: 'stretch',
-      minWidth: 200,
-      maxWidth: 1200,
-      minHeight: 300,
-      maxHeight: 1600,
+      minWidth: Math.round(dims.pageWidth * 0.4),
+      maxWidth: Math.round(dims.pageWidth * 1.8),
+      minHeight: Math.round(dims.pageHeight * 0.4),
+      maxHeight: Math.round(dims.pageHeight * 1.8),
       showCover: true,
       maxShadowOpacity: 0.5,
       mobileScrollSupport: false,
@@ -165,18 +173,19 @@ async function renderPage(pdf, pageNum, width, height, scale) {
   const page = await pdf.getPage(pageNum);
   const viewport = page.getViewport({ scale: 1 });
 
-  // Scale to fit target dimensions
-  const targetScale = Math.min(width / viewport.width, height / viewport.height) * scale;
+  // Use higher DPR scale (at least 1.5x) so text and images render ultra-crisp
+  const dpr = Math.max(scale || 1, window.devicePixelRatio || 1, 1.5);
+  const targetScale = Math.min(width / viewport.width, height / viewport.height) * dpr;
   const scaledViewport = page.getViewport({ scale: targetScale });
 
   const canvas = document.createElement('canvas');
-  canvas.width = scaledViewport.width;
-  canvas.height = scaledViewport.height;
+  canvas.width = Math.round(scaledViewport.width);
+  canvas.height = Math.round(scaledViewport.height);
 
   const ctx = canvas.getContext('2d');
   await page.render({ canvasContext: ctx, viewport: scaledViewport }).promise;
 
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.90);
   page.cleanup();
   return dataUrl;
 }
@@ -185,15 +194,30 @@ async function renderPage(pdf, pageNum, width, height, scale) {
 
 function calcDimensions(pageRatio) {
   const isMobile = window.innerWidth <= 768;
-  const maxW = isMobile ? window.innerWidth - 20 : Math.min(window.innerWidth * 0.45, 600);
-  const maxH = window.innerHeight - 180;
+  const isFullscreen = !!document.fullscreenElement;
 
-  let pageWidth = maxW;
-  let pageHeight = pageWidth / pageRatio;
+  // Header height (~50px), Controls bar (~58px), plus margins
+  const headerH = isFullscreen ? 30 : 52;
+  const controlsH = 58;
+  const marginV = isFullscreen ? 20 : 28;
+  const availH = Math.max(window.innerHeight - headerH - controlsH - marginV, 360);
 
-  if (pageHeight > maxH) {
-    pageHeight = maxH;
-    pageWidth = pageHeight * pageRatio;
+  // Horizontal space:
+  // On desktop, 2 pages are displayed side-by-side
+  // On mobile, 1 page is shown
+  const marginH = isMobile ? 16 : 48;
+  const availW = isMobile
+    ? Math.max(window.innerWidth - marginH, 280)
+    : Math.max((window.innerWidth - marginH) / 2, 280);
+
+  // Fit as large as possible vertically while keeping aspect ratio
+  let pageHeight = availH;
+  let pageWidth = pageHeight * pageRatio;
+
+  // If width exceeds available half-screen on desktop (or full-screen on mobile), scale by width
+  if (pageWidth > availW) {
+    pageWidth = availW;
+    pageHeight = pageWidth / pageRatio;
   }
 
   return {
@@ -231,8 +255,7 @@ function toggleFullscreen() {
 document.addEventListener('fullscreenchange', () => {
   viewerPage.classList.toggle('fullscreen', !!document.fullscreenElement);
   if (pageFlip) {
-    // Give the browser a tick to recalculate layout
-    setTimeout(() => pageFlip.update(), 100);
+    setTimeout(handleResize, 100);
   }
 });
 
@@ -242,8 +265,14 @@ let resizeTimeout;
 function handleResize() {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
-    if (pageFlip) pageFlip.update();
-  }, 200);
+    if (!pageFlip) return;
+    const newDims = calcDimensions(currentRatio);
+    const isMobile = window.innerWidth <= 768;
+    const spreadW = isMobile ? newDims.pageWidth : newDims.pageWidth * 2;
+    flipbookEl.style.width = `${spreadW}px`;
+    flipbookEl.style.height = `${newDims.pageHeight}px`;
+    pageFlip.update();
+  }, 150);
 }
 
 // ── Error helper ────────────────────────────────────────────
